@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: DEPLOYMENT_NAME-NAMESPACE-deployment
+   namespace: NAMESPACE-env
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: DEPLOYMENT_NAME-NAMESPACE-deployment
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: DEPLOYMENT_NAME-NAMESPACE-deployment
+    spec:
+      containers:
+      - name: DEPLOYMENT_NAME-NAMESPACE-deployment
+        image: dockerImageName
+        env:
+          - name: OPENAI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: openai-sc
+                key: openai-sc
+        ports:
+        - containerPort: 5003
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: DEPLOYMENT_NAME-NAMESPACE-service
+  namespace: NAMESPACE-env
+  labels:
+    app: DEPLOYMENT_NAME-NAMESPACE-service
+spec:
+  selector:
+    app: DEPLOYMENT_NAME-NAMESPACE-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5003
+  type: ClusterIP

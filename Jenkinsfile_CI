@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+    environment {
+        dockerImageName = "shehan97105/editservice:${GIT_COMMIT}"
+        dockerImage = null
+    }
+    stages {
+        stage('Build') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/RaviduShehan/EditAPIService']]])
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build dockerImageName
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            environment {
+                registryCredential = 'dockerlogin'
+            }
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('Trigger CD Pipeline') {
+            steps {
+                script {
+                    build job: 'CD-EditService', parameters: [
+                        string(name: 'DOCKER_IMAGE_NAME', value: dockerImageName),
+                        string(name: 'KUBECONFIG_ID', value: 'kubernetesconfigpwd')
+                    ]
+                }
+            }
+        }
+    }
+}
