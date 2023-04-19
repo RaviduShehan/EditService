@@ -48,7 +48,7 @@ def edit():
         )
         return jsonify(response=response.choices[0].text.strip())
     except Exception as e:
-        # Update service status to 'error' if an exception occurs
+        # Update service status to 'error' if an exception occur
         service_ref.update({'status': 'Error'})
         return jsonify(error=str(e)), 500
 
