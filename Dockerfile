@@ -10,5 +10,5 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="./serviceAccountKey.json"
 RUN pip install google-cloud-firestore
 RUN pip install firebase-admin
 
-EXPOSE 5001
+EXPOSE 5003
 ENTRYPOINT ["python", "./src/edit.py"]
