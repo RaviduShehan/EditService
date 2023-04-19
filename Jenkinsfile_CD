@@ -11,7 +11,7 @@ pipeline {
         gkeClusterName = "openai-api-cluster"
         gkeZone = "us-central1-c"
         gkeCredentialsId = "apiservicesauth"
-        NAMESPACE_ID="dev"
+        NAMESPACE_ID="test"
         DEPLOYMENT_ID="editserviceapi"
     }
     stages{
