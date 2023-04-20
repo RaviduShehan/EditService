@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: DEPLOYMENT_NAME-NAMESPACE-deployment
+   name: DEPLOYMENT_NAME-NAMESPACE
    namespace: NAMESPACE-env
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: DEPLOYMENT_NAME-NAMESPACE-deployment
+      app: DEPLOYMENT_NAME-NAMESPACE
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -16,10 +16,10 @@ spec:
   template:
     metadata:
       labels:
-        app: DEPLOYMENT_NAME-NAMESPACE-deployment
+        app: DEPLOYMENT_NAME-NAMESPACE
     spec:
       containers:
-      - name: DEPLOYMENT_NAME-NAMESPACE-deployment
+      - name: DEPLOYMENT_NAME-NAMESPACE
         image: dockerImageName
         env:
           - name: OPENAI_API_KEY
@@ -34,13 +34,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: DEPLOYMENT_NAME-NAMESPACE-service
+  name: DEPLOYMENT_NAME-NAMESPACE
   namespace: NAMESPACE-env
   labels:
-    app: DEPLOYMENT_NAME-NAMESPACE-service
+    app: DEPLOYMENT_NAME-NAMESPACE
 spec:
   selector:
-    app: DEPLOYMENT_NAME-NAMESPACE-service
+    app: DEPLOYMENT_NAME-NAMESPACE
   ports:
     - name: http
       port: 80
