@@ -11,7 +11,7 @@ pipeline {
         gkeClusterName = "openai-api-cluster"
         gkeZone = "us-central1-c"
         gkeCredentialsId = "apiservicesauth"
-        DEPLOYMENT_ID="editserviceapi"
+        DEPLOYMENT_ID="editapi"
     }
     stages{
         stage('Get docker Image'){
@@ -30,7 +30,7 @@ pipeline {
                     manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
                     manifest = manifest.replaceAll('NAMESPACE', "dev")
                     manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
-                    writeFile file: 'edit.yml', text: manifest
+                    writeFile file: 'editdev.yml', text: manifest
                 }
                 step([
                     $class: 'KubernetesEngineBuilder',
@@ -38,13 +38,19 @@ pipeline {
                     credentialsId: gkeCredentialsId,
                     clusterName: gkeClusterName,
                     location: gkeZone,
-                    manifestPattern: 'edit.yml'
+                    manifestPattern: 'editdev.yml'
                 ])
             }
         }
         stage('Deploy to Test Environment') {
             steps {
                 script {
+                    def manifest = readManifestFile('edit.yml')
+                    manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
+                    manifest = manifest.replaceAll('NAMESPACE',"test" )
+                    manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
+                    writeFile file: 'edittest.yml', text: manifest
+
                     def deployApproved = false
                     while (!deployApproved) {
                         def inputMessage = "Deploy to Test Environment? (yes/no)"
@@ -58,26 +64,25 @@ pipeline {
                         }
                     }
                 }
-                script {
-                    def manifest = readManifestFile('edit.yml')
-                    manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
-                    manifest = manifest.replaceAll('NAMESPACE', "test")
-                    manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
-                    writeFile file: 'edit.yml', text: manifest
-                }
                 step([
                     $class: 'KubernetesEngineBuilder',
                     projectId: 'apiservices-384122',
                     credentialsId: gkeCredentialsId,
                     clusterName: gkeClusterName,
                     location: gkeZone,
-                    manifestPattern: 'edit.yml'
+                    manifestPattern: 'edittest.yml'
                 ])
             }
         }
          stage('Deploy to Prod Environment') {
             steps {
                 script {
+                    def manifest = readManifestFile('edit.yml')
+                    manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
+                    manifest = manifest.replaceAll('NAMESPACE', "prod")
+                    manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
+                    writeFile file: 'editprod.yml', text: manifest
+
                     def deployApproved = false
                     while (!deployApproved) {
                         def inputMessage = "Deploy to Prod Environment? (yes/no)"
@@ -91,21 +96,15 @@ pipeline {
                         }
                     }
                 }
-                script {
-                    def manifest = readManifestFile('edit.yml')
-                    manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
-                    manifest = manifest.replaceAll('NAMESPACE', "prod")
-                    manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
-                    writeFile file: 'edit.yml', text: manifest
-                }
                 step([
                     $class: 'KubernetesEngineBuilder',
                     projectId: 'apiservices-384122',
                     credentialsId: gkeCredentialsId,
                     clusterName: gkeClusterName,
                     location: gkeZone,
-                    manifestPattern: 'edit.yml'
+                    manifestPattern: 'editprod.yml'
                 ])
+
             }
     }
 }
