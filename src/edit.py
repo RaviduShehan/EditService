@@ -11,6 +11,7 @@ from firebase_admin import credentials
 #setup firebase credentials
 cred = credentials.Certificate("./serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
+database = os.environ.get('FIREBASE_DATABASE_COLLECTION')
 
 app = Flask(__name__)
 
@@ -24,7 +25,7 @@ db = firestore.Client(project=project_id)
 @app.route('/')
 def edit():
     # Add service name, status, and timestamp to Firestore
-    service_ref = db.collection('Services').document('EditService_Status')
+    service_ref = db.collection(database).document('EditService_Status')
     print("Edit Service starting...")
     service_data = {
         'service_name': 'Edit',

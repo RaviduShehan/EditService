@@ -27,6 +27,8 @@ spec:
               secretKeyRef:
                 name: openai-sc
                 key: openai-sc
+          - name: FIREBASE_DATABASE_COLLECTION
+            value: NAMESPACE-env
         ports:
         - containerPort: 5003
 
