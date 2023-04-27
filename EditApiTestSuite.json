@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "b8e269ed-0562-404b-a61d-86957c9e8c4c",
+		"name": "EditAPI Test suite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25119759"
+	},
+	"item": [
+		{
+			"name": "Test missing prompt parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Prompt parameter is missing\", function () {\r",
+							"    pm.expect(pm.response.json()).to.deep.equal({\r",
+							"        \"error\": \"Prompt parameter is missing\"\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://34.132.224.27/edit/",
+					"protocol": "http",
+					"host": [
+						"34",
+						"132",
+						"224",
+						"27"
+					],
+					"path": [
+						"edit",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Successful response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Response body is not empty\r",
+							"pm.test(\"Response body is not empty\", function () {\r",
+							"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://34.132.224.27/edit?prompt=edit%2C%20this%3F",
+					"protocol": "http",
+					"host": [
+						"34",
+						"132",
+						"224",
+						"27"
+					],
+					"path": [
+						"edit"
+					],
+					"query": [
+						{
+							"key": "prompt",
+							"value": "edit%2C%20this%3F"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
