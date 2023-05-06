@@ -40,24 +40,6 @@ spec:
           failureThreshold: 3
           successThreshold: 1
           timeoutSeconds: 1
-        initContainers:
-          - name: prometheus-exporter
-            image: prom/node-exporter:v1.2.2
-            ports:
-              - containerPort: 9100
-            args:
-              - '--web.listen-address=:9100'
-              - '--path.rootfs=/hostfs'
-            volumeMounts:
-              - name: hostfs
-                mountPath: /hostfs
-            securityContext:
-              privileged: true
-        volumes:
-          - name: hostfs
-            hostPath:
-              path: /
-              type: ""
 
 ---
 apiVersion: v1
