@@ -25,8 +25,8 @@ spec:
           - name: OPENAI_API_KEY
             valueFrom:
               secretKeyRef:
-                name: openai-sc
-                key: openai-sc
+                name: openai-scn
+                key: openai-scn
           - name: FIREBASE_DATABASE_COLLECTION
             value: NAMESPACE-env
         ports:
