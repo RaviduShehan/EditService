@@ -31,6 +31,33 @@ spec:
             value: NAMESPACE-env
         ports:
         - containerPort: 5003
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5003
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        initContainers:
+          - name: prometheus-exporter
+            image: prom/node-exporter:v1.2.2
+            ports:
+              - containerPort: 9100
+            args:
+              - '--web.listen-address=:9100'
+              - '--path.rootfs=/hostfs'
+            volumeMounts:
+              - name: hostfs
+                mountPath: /hostfs
+            securityContext:
+              privileged: true
+        volumes:
+          - name: hostfs
+            hostPath:
+              path: /
+              type: ""
 
 ---
 apiVersion: v1
@@ -47,4 +74,7 @@ spec:
     - name: http
       port: 80
       targetPort: 5003
+    - name: metrics
+      port: 9090
+      targetPort: 9090
   type: ClusterIP
