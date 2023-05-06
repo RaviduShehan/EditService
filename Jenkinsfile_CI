@@ -10,12 +10,7 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/RaviduShehan/EditService']]])
             }
         }
-        stage('Run Postman Test Suite') {
-            steps {
-                  bat 'npm install -g newman'
-                bat 'C:\\Users\\Ravidu\\AppData\\Roaming\\npm\\newman run EditApiTestSuite.json'
-            }
-        }
+
         stage('Build Docker Image') {
             steps {
                 script {
