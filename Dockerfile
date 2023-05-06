@@ -12,4 +12,3 @@ RUN pip install firebase-admin
 
 EXPOSE 5003
 ENTRYPOINT ["python", "./src/edit.py"]
-CMD ["--prometheus_port=9091"]
