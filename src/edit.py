@@ -65,7 +65,7 @@ def edit():
 
 if __name__ == '__main__':
     # Start HTTP server for metrics exposition
-    start_http_server(8000)
+    start_http_server(9090)
 
     # Start Flask app
     app.run(debug=True, host='0.0.0.0', port=5003)
