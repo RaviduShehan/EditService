@@ -1,0 +1,58 @@
+def readManifestFile(file) {
+    return readFile(file).trim()
+}
+
+pipeline {
+    agent any
+    environment {
+        DOCKERIMAGE = "shehan97105/editservice:${GIT_COMMIT}"
+        kubeconfigId = "${params.KUBECONFIG_ID}"
+
+        gkeClusterName = "openai-api-cluster"
+        gkeZone = "us-central1-c"
+        gkeCredentialsId = "apiservicesauth"
+        DEPLOYMENT_ID = "chatapi"
+    }
+    stages{
+        stage('Get docker Image'){
+            steps {
+                script {
+                    echo "Docker image name: ${DOCKERIMAGE}"
+                }
+            }
+        }
+        stage('Deploy to Prod Environment') {
+            steps {
+                script {
+                    def manifest = readManifestFile('edit.yml')
+                    manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
+                    manifest = manifest.replaceAll('NAMESPACE', "prod")
+                    manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
+                    writeFile file: 'editprod.yml', text: manifest
+
+                    def deployApproved = false
+                    while (!deployApproved) {
+                        def inputMessage = "Deploy to Prod Environment? (yes/no)"
+                        def inputResult = input message: inputMessage, parameters: [string(defaultValue: 'no', description: '', name: 'deploy')]
+                        if (inputResult.toLowerCase() == "yes") {
+                            deployApproved = true
+                        } else {
+                            echo "Deployment to Prod Environment not approved"
+                            currentBuild.result = 'ABORTED'
+                            error("Pipeline aborted: Deployment not approved")
+                        }
+                    }
+                }
+                step([
+                    $class: 'KubernetesEngineBuilder',
+                    projectId: 'apiservices-384122',
+                    credentialsId: gkeCredentialsId,
+                    clusterName: gkeClusterName,
+                    location: gkeZone,
+                    manifestPattern: 'editprod.yml'
+                ])
+
+            }
+    }
+ }
+}

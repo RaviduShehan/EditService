@@ -5,32 +5,30 @@ def readManifestFile(file) {
 pipeline {
     agent any
     environment {
-        DOCKERIMAGE = "${params.DOCKER_IMAGE_NAME}"
+        DOCKERIMAGE = "shehan97105/editservice:${GIT_COMMIT}"
         kubeconfigId = "${params.KUBECONFIG_ID}"
 
         gkeClusterName = "openai-api-cluster"
         gkeZone = "us-central1-c"
         gkeCredentialsId = "apiservicesauth"
-        DEPLOYMENT_ID="editapi"
+        DEPLOYMENT_ID = "chatapi"
     }
     stages{
         stage('Get docker Image'){
             steps {
                 script {
                     echo "Docker image name: ${DOCKERIMAGE}"
-                    echo "DEPLOYMENT_ID: ${DEPLOYMENT_ID}"
                 }
             }
         }
-        stage('Deploy to Dev Environment') {
+        stage('Deploy to Test Environment') {
             steps {
-                echo "Deploy to Dev Env"
-                 script {
+                script {
                     def manifest = readManifestFile('edit.yml')
                     manifest = manifest.replaceAll('DEPLOYMENT_NAME', "${DEPLOYMENT_ID}")
-                    manifest = manifest.replaceAll('NAMESPACE', "dev")
+                    manifest = manifest.replaceAll('NAMESPACE',"test" )
                     manifest = manifest.replaceAll('dockerImageName',"${DOCKERIMAGE}")
-                    writeFile file: 'editdev.yml', text: manifest
+                    writeFile file: 'edittest.yml', text: manifest
                 }
                 step([
                     $class: 'KubernetesEngineBuilder',
@@ -38,10 +36,9 @@ pipeline {
                     credentialsId: gkeCredentialsId,
                     clusterName: gkeClusterName,
                     location: gkeZone,
-                    manifestPattern: 'editdev.yml'
+                    manifestPattern: 'edittest.yml'
                 ])
             }
         }
-
-}
+    }
 }
