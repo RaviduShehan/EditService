@@ -38,7 +38,7 @@ pipeline {
         stage('Trigger CD Pipeline') {
             steps {
                 script {
-                    build job: 'CD-EditService', parameters: [
+                    build job: 'CD-EditService-Full', parameters: [
                         string(name: 'DOCKER_IMAGE_NAME', value: dockerImageName),
                         string(name: 'KUBECONFIG_ID', value: 'kubernetesconfigpwd')
                     ]
